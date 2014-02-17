@@ -1,29 +1,31 @@
+// This #include statement was automatically added by the Spark IDE.
 #include "mag3110.h"
 
 /*
-  MAG3110 Test Code
-  by: Keith Baker (kbaker at alumni dit ithaca dit edu) Feb 2014
-  Adapted from Aaron Weiss, aaron at sparkfun dot com
-      SparkFun Electronics 2011
-  date: 9/6/11
-  license: beerware, if you use this code and happen to meet me, you
+   MAG3110 Breakout Example Code
+
+   by: Aaron Weiss, aaron at sparkfun dot com
+       SparkFun Electronics 2011
+   date: 9/6/11
+   license: beerware, if you use this code and happen to meet me, you
            can by me a beer
 
-  The code reads the raw 16-bit x, y, and z values and prints them 
-  out forever.
+   The code reads the raw 16-bit x, y, and z values and prints them
+   out. This sketch does not use the INT1 pin, nor does it poll for
+   new data.
+
 */
 
-mag3110 m;
-byte available = 0;
+mag3110 m = mag3110();
+volatile bool magready = true;
 
 #define LED        D7
 #define MAG_INT    D2
 
 void magisr(void){
-  //  detachInterrupt(MAG_INT);
-  //  Serial.println("INT!");
-  m.fastread();
-  //  attachInterrupt(MAG_INT, magisr, RISING);
+  digitalWrite(LED,HIGH);
+  magready = true;
+  digitalWrite(LED,LOW);
 }
 
 void setup()
@@ -42,28 +44,40 @@ void setup()
   Serial.println("Starting...");
   Wire.begin();        // join i2c bus (address optional for master)
   pinMode(MAG_INT, INPUT_PULLDOWN);
-  m = mag3110();
+  //m = mag3110();
   m.config();          // turn the MAG3110 on
   Serial.println("Configured");
   attachInterrupt(D2, magisr, RISING);
-  m.fastread();
   Serial.println("Interrupt Enabled");
+  RGB.control(true);
 }
 
 void loop()
 {
-  available = m.available();
-  if (available){
+  if (magready){
+    RGB.color(255, 0, 0);
+    if (not m.fastread()){
+      magready = false;
+    }
+    else {
+      Serial.println("I2C Read Error");
+    }
+    RGB.color(0, 255, 0);
+  }
+  else if (m.available()){
+    RGB.color(0, 255, 255);
     print_values();
     m.advance();
+    RGB.color(0, 0, 255);
+  }
+  else {
+    RGB.color(255, 255, 255);
   }
 }
 
 void print_values(void)
 {
-  Serial.print("available=");
-  Serial.print(available);
-  Serial.print(",x=");
+  Serial.print("x=");
   Serial.print(m.getx());
   Serial.print(",y=");
   Serial.print(m.gety());

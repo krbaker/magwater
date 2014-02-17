@@ -1,6 +1,6 @@
 #ifndef MAG3110
 #define MAG3110
-#define TWBR 400000L //Speed up our i2c
+#define TWBR 100000L //Speed up our i2c
 
 #define MAG_ADDR  0x0E //7-bit address for the MAG3110, doesn't change
 #define MAG_X_REG  0x01 //Register for X MSB
@@ -17,24 +17,24 @@ class mag3110 {
   mag3110();
   ~mag3110();
   void config(bool active_mode = true, bool auto_restart = true);
-  int readx();
-  int ready();
-  int readz();
-  int getx();
-  int gety();
-  int getz();
+  int16_t readx();
+  int16_t ready();
+  int16_t readz();
+  int16_t getx();
+  int16_t gety();
+  int16_t getz();
   byte available();
   void advance();
-  void fastread();
+  byte fastread();
 
  private:
-  int read(byte start_offset);
-  volatile int x[MAG_BUFFER_DEPTH];
-  volatile int y[MAG_BUFFER_DEPTH];
-  volatile int z[MAG_BUFFER_DEPTH];
+  int16_t read(byte start_offset);
+  int16_t x[MAG_BUFFER_DEPTH];
+  int16_t y[MAG_BUFFER_DEPTH];
+  int16_t z[MAG_BUFFER_DEPTH];
   byte read_position;
-  volatile byte write_position;
-  volatile byte fill;
+  byte write_position;
+  byte fill;
 };
 
 #endif

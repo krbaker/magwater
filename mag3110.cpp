@@ -1,14 +1,14 @@
 #include "mag3110.h"
 
-mag3110::mag3110(){
+mag3110::mag3110() {
   read_position = 0;
   write_position = 0;
   fill = 0;
 }
 
-mag3110::~mag3110(){}
+mag3110::~mag3110() {}
 
-void mag3110::fastread(){
+byte mag3110::fastread(void){
   Wire.beginTransmission(MAG_ADDR); // transmit to device 0x0E
   Wire.write(MAG_X_REG);              // x MSB reg
   Wire.endTransmission();       // stop transmitting
@@ -24,32 +24,44 @@ void mag3110::fastread(){
     z[write_position] = z[write_position] | Wire.read(); // receive the byte
     write_position = (write_position + 1) % MAG_BUFFER_DEPTH;          // Move the write position into the next spot so its clearly ready
     fill ++;
+    return 0;
+  }
+  else {
+    return 1;
   }
 }
 
 void mag3110::config(bool active_mode, bool auto_restart){
+  byte config_reg = 0;
+  if (active_mode){
+    config_reg |= MAG_ACTIVE_MODE;
+  }
   Wire.beginTransmission(MAG_ADDR); // transmit to device 0x0E
-  Wire.write(0x11);              // cntrl register2
-  Wire.write(0x80);              // send 0x80, enable auto resets
-  Wire.endTransmission();       // stop transmitting
+  Wire.write(MAG_CONFIG_REG1);      // select control register 1
+  Wire.write(config_reg);           // Send config data
+  Wire.endTransmission();           // stop transmitting
 
-  delay(15);
+  delay(15);                        //Let config settle?
 
+  config_reg = 0;
+  if (auto_restart){
+    config_reg |= MAG_AUTO_RESTART;
+  }
   Wire.beginTransmission(MAG_ADDR); // transmit to device 0x0E
-  Wire.write(0x10);              // cntrl register1
-  Wire.write(1);                 // send 0x01, active mode
-  Wire.endTransmission();       // stop transmitting
+  Wire.write(MAG_CONFIG_REG2);      // select control register 2
+  Wire.write(config_reg);           // Send config data
+  Wire.endTransmission();           // stop transmitting
 }
 
-int mag3110::getx(){
+int16_t mag3110::getx(){
   return x[read_position];
 }
 
-int mag3110::gety(){
+int16_t mag3110::gety(){
   return y[read_position];
 }
 
-int mag3110::getz(){
+int16_t mag3110::getz(){
   return z[read_position];
 }
 
@@ -62,19 +74,19 @@ void mag3110::advance(){
   fill --;
 }
 
-int mag3110::readx(){
+int16_t mag3110::readx(){
   return mag3110::read(MAG_X_REG);
 }
 
-int mag3110::ready(){
+int16_t mag3110::ready(){
   return mag3110::read(MAG_Y_REG);
 }
 
-int mag3110::readz(){
+int16_t mag3110::readz(){
   return mag3110::read(MAG_Z_REG);
 }
 
-int mag3110::read(byte start_offset){
+int16_t mag3110::read(byte start_offset){
 
   Wire.beginTransmission(MAG_ADDR); // transmit to device 0x0E
   Wire.write(start_offset);              // z MSB reg
