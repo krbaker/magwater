@@ -13,21 +13,18 @@ byte mag3110::fastread(void){
   Wire.write(MAG_X_REG);              // x MSB reg
   Wire.endTransmission();       // actually send
   delayMicroseconds(2); //needs at least 1.3us free time between start and stop
-  byte response = Wire.requestFrom(MAG_ADDR, 6);
-  if (response == 6){  // request 6 bytes, if we get them all, great, if not ignore
-    x[write_position] = Wire.read() << 8; // receive the byte
-    x[write_position] = x[write_position] | Wire.read(); // receive the byte
-    y[write_position] = Wire.read() << 8; // receive the byte
-    y[write_position] = y[write_position] | Wire.read(); // receive the byte
-    z[write_position] = Wire.read() << 8; // receive the byte
-    z[write_position] = z[write_position] | Wire.read(); // receive the byte
-    write_position = (write_position + 1) % MAG_BUFFER_DEPTH;          // Move the write position into the next spot so its clearly ready
-    fill ++;
-    return 0;
-  }
-  else {
-    return 1;
-  }
+
+  if (Wire.requestFrom(MAG_ADDR, 6, true) != 6) return 1;
+  x[write_position] = Wire.read() << 8; // receive the byte
+  x[write_position] = x[write_position] | Wire.read(); // receive the byte
+  y[write_position] = Wire.read() << 8; // receive the byte
+  y[write_position] = y[write_position] | Wire.read(); // receive the byte
+  z[write_position] = Wire.read() << 8; // receive the byte
+  z[write_position] = z[write_position] | Wire.read(); // receive the byte
+  write_position = (write_position + 1) % MAG_BUFFER_DEPTH;          // Move the write position into the next spot so its clearly ready
+  fill ++;
+
+  return 0;
 }
 
 void mag3110::config(bool active_mode, bool auto_restart){
