@@ -73,13 +73,3 @@ void loop()
     m.advance();
   }
 }
-
-void print_values(void)
-{
-  Serial.print("x=");
-  Serial.print(m.getx());
-  Serial.print(",y=");
-  Serial.print(m.gety());
-  Serial.print(",z=");
-  Serial.println(m.getz());
-}
