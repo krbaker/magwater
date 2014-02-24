@@ -2,17 +2,14 @@
 #include "mag3110.h"
 
 /*
-   MAG3110 Breakout Example Code
+    MAG3110 Watermeter Reader
+    Author: Keith Baker
+    Email: kbaker at alumni dot ithaca dot edu
+    
+    Very loosely based off of: MAG3110 Breakout Example Code
+                           by: Aaron Weiss, aaron at sparkfun dot com
 
-   by: Aaron Weiss, aaron at sparkfun dot com
-       SparkFun Electronics 2011
-   date: 9/6/11
-   license: beerware, if you use this code and happen to meet me, you
-           can by me a beer
-
-   The code reads the raw 16-bit x, y, and z values and prints them
-   out. This sketch does not use the INT1 pin, nor does it poll for
-   new data.
+    Track magnetic impeller of a water meter using a digital compass.
 
 */
 
