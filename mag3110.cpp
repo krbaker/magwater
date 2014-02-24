@@ -1,3 +1,4 @@
+#include "application.h"
 #include "mag3110.h"
 
 mag3110::mag3110() {
