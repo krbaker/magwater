@@ -1,6 +1,5 @@
 #ifndef MAG3110
 #define MAG3110
-#define TWBR 100000L //Speed up our i2c
 
 #define MAG_ADDR  0x0E //7-bit address for the MAG3110, doesn't change
 #define MAG_X_REG  0x01 //Register for X MSB
