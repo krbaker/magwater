@@ -11,8 +11,7 @@ mag3110::~mag3110() {}
 byte mag3110::fastread(void){
   Wire.beginTransmission(MAG_ADDR); // transmit to device 0x0E
   Wire.write(MAG_X_REG);              // x MSB reg
-  Wire.endTransmission();       // stop transmitting
-
+  Wire.endTransmission();       // actually send
   delayMicroseconds(2); //needs at least 1.3us free time between start and stop
   byte response = Wire.requestFrom(MAG_ADDR, 6);
   if (response == 6){  // request 6 bytes, if we get them all, great, if not ignore
