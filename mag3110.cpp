@@ -94,10 +94,9 @@ int16_t mag3110::read(byte start_offset){
 
   delayMicroseconds(2); //needs at least 1.3us free time between start and stop
 
-  Wire.requestFrom(MAG_ADDR, 2); // request 2 bytes
-  while(Wire.available() < 2)    // slave may send less than requested
-    {
-    }
+  if (Wire.requestFrom(MAG_ADDR, 2) != 2){ 
+    return 0; // This is ghetto...  should really have a way to signal an error 
+  };
   int result = Wire.read() << 8; // receive the high byte
   result |= Wire.read();
   return result;
