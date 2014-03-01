@@ -4,10 +4,10 @@
 #include "flipflop.h"
 
 // This #include statement was automatically added by the Spark IDE.
-#include "mag3110.h"
+#include "hmc5883l.h"
 
 /*
-    MAG3110 Watermeter Reader
+    HMC5883l Watermeter Reader
     Author: Keith Baker
     Email: kbaker at alumni dot ithaca dot edu
     
@@ -18,16 +18,10 @@
 
 */
 
-mag3110 m = mag3110();
+hmc5883l hmc = hmc5883l();
 flipflop counter = flipflop();
-volatile bool magready = true;
 
 #define LED        D7
-#define MAG_INT    D2
-
-void magisr(void){
-  magready = true;
-}
 
 void setup()
 {
@@ -46,26 +40,18 @@ void setup()
   //to late, hold on tight!
   Serial.println("Starting...");
   Wire.begin();        // join i2c bus (address optional for master)
-  pinMode(MAG_INT, INPUT_PULLDOWN);
-  m.config();          // turn the MAG3110 on
+  hmc.config();        // turn the HMC5883l on
   Serial.println("Configured");
-  attachInterrupt(MAG_INT, magisr, RISING);
-  Serial.println("Interrupt Enabled");
 }
 
 void loop()
 {
-  if (magready){
-    magready = false; //we know this interrupt has happened, make sure we can catch the next one
+  if (hmc.ready()){
     digitalWrite(LED,HIGH);
     if (m.fastread()){
       Serial.println("I2C Read Error");
-      magready = true; //we should try and re-read
     }
     digitalWrite(LED,LOW);
-    if (digitalRead(MAG_INT)){
-      magready = true;
-    }
   }
   else if (m.available()){
     counter.append(m.getz());
