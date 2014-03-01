@@ -7,6 +7,7 @@ class flipflop {
   ~flipflop();
   unsigned long append(int16_t new_point);
   void debug();
+  unsigned long count;
 
  private:
   int16_t min;
@@ -15,8 +16,8 @@ class flipflop {
   int16_t real_max;
   int16_t hystaresis;
   bool direction;
-  unsigned long count;
   byte current;
+
 };
 
 #endif
