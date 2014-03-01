@@ -20,12 +20,16 @@
 
 hmc5883l hmc = hmc5883l();
 flipflop counter = flipflop();
+unsigned long last = millis();
+unsigned long now = millis();
+byte mps = 0;
+unsigned long last_count = 0;
 
 #define LED        D7
 
 void setup()
 {
-  Serial.begin(9600);  // start serial for output
+  Serial.begin(115200);  // start serial for output
   Serial.println("Cloud!");
 
   //let us know we are connected to cloud so we can re-flash bad code
@@ -39,23 +43,35 @@ void setup()
 
   //to late, hold on tight!
   Serial.println("Starting...");
-  Wire.begin();        // join i2c bus (address optional for master)
+  Wire.begin(true);        // join i2c bus at high speed
   hmc.config();        // turn the HMC5883l on
   Serial.println("Configured");
 }
 
 void loop()
 {
-  if (hmc.ready()){
+
+  now = millis();
+  if (hmc.ready(now)){
     digitalWrite(LED,HIGH);
-    if (m.fastread()){
+    if (hmc.fastread()){
       Serial.println("I2C Read Error");
     }
     digitalWrite(LED,LOW);
   }
-  else if (m.available()){
-    counter.append(m.getz());
-    counter.debug();
-    m.advance();
+  else if (hmc.available()){
+    counter.append(hmc.getz());
+    //counter.debug();
+    hmc.advance();
+    mps ++;
   }
+  if (now - last > 1000){
+    last = now;
+    Serial.print(counter.count - last_count);
+    last_count = counter.count;
+    Serial.print(" ");
+    Serial.println(mps);
+    mps = 0;
+  }
+
 }

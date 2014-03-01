@@ -11,8 +11,15 @@ hmc5883l::~hmc5883l() {}
 
 byte hmc5883l::fastread(void){
   Wire.beginTransmission(HMC_ADDR); // transmit to device 0x0E
+  Wire.write(HMC_MODE);             // x MSB reg
+  Wire.write(0x01);                 // Send single read
+  Wire.endTransmission();           // actually send
+  //delayMicroseconds(2);             //needs at least 1.3us free time between start and stop
+  last_read = millis();
+
+  Wire.beginTransmission(HMC_ADDR); // transmit to device 0x0E
   Wire.write(HMC_X_REG);              // x MSB reg
-  Wire.endTransmission();       // actually send
+  //Wire.endTransmission();       // actually send
   delayMicroseconds(2); //needs at least 1.3us free time between start and stop
 
   if (Wire.requestFrom(HMC_ADDR, 6, true) != 6) return 1;
@@ -22,9 +29,11 @@ byte hmc5883l::fastread(void){
   y[write_position] = y[write_position] | Wire.read(); // receive the byte
   z[write_position] = Wire.read() << 8; // receive the byte
   z[write_position] = z[write_position] | Wire.read(); // receive the byte
-  write_position = (write_position + 1) % HMC_BUFFER_DEPTH;          // Move the write position into the next spot so its clearly ready
+  write_position = write_position + 1;
+  if (write_position >= HMC_BUFFER_DEPTH){
+    write_position = 0;
+  } // Move the write position into the next spot so its clearly ready
   fill ++;
-  last_read = millis();
   return 0;
 }
 
@@ -32,8 +41,12 @@ void hmc5883l::config(){
   last_read = millis();
 }
 
-void hmc5883l::ready(){
-  if ((last_read + HMC_REFRESH) < millis()){
+bool hmc5883l::ready(){
+  ready(millis());
+}
+
+bool hmc5883l::ready(unsigned long t){
+  if ((last_read + HMC_REFRESH) < t){
     return true;
   }
   return false;
@@ -56,7 +69,10 @@ byte hmc5883l::available(){
 }
 
 void hmc5883l::advance(){
-  read_position = (read_position + 1) % HMC_BUFFER_DEPTH;
+  read_position = read_position + 1;
+  if (read_position >= HMC_BUFFER_DEPTH){
+    read_position = 0;
+  }
   fill --;
 }
 

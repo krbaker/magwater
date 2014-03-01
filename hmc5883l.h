@@ -1,7 +1,7 @@
 #ifndef HMC5883L
 #define HMC5883L
 
-#define HMC_ADDR  0x3C //7-bit address for the HMC5883L, doesn't change
+#define HMC_ADDR  0x1E //7-bit address for the HMC5883L, doesn't change
 
 #define HMC_CONFIG_REG    0x00 //Config Register
 #define HMC_GAIN_REG      0x01 //Gain   Register
@@ -23,6 +23,7 @@ class hmc5883l {
   int16_t getz();
   byte available();
   bool ready();
+  bool ready(unsigned long);
   void advance();
   byte fastread();
 
