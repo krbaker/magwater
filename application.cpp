@@ -24,6 +24,8 @@ unsigned long last = millis();
 unsigned long now = millis();
 byte mps = 0;
 unsigned long last_count = 0;
+float avg = 0;
+bool blink = false;
 
 #define LED        D7
 
@@ -46,11 +48,11 @@ void setup()
   Wire.begin(true);        // join i2c bus at high speed
   hmc.config();        // turn the HMC5883l on
   Serial.println("Configured");
+  RGB.control(true);
 }
 
 void loop()
 {
-
   now = millis();
   if (hmc.ready(now)){
     digitalWrite(LED,HIGH);
@@ -67,10 +69,21 @@ void loop()
   }
   if (now - last > 1000){
     last = now;
-    Serial.print(counter.count - last_count);
+    int delta = counter.count - last_count; 
     last_count = counter.count;
+    avg = ((avg * 59.0) + delta) / 60.0;
+    Serial.print(delta);
+    Serial.print(" "); 
+    Serial.print(avg); 
     Serial.print(" ");
     Serial.println(mps);
+    if (blink){
+      blink = false;
+    }
+    else {
+      blink = true;
+    }
+    RGB.color(delta * 10, (int)(avg * 10.0), (int)blink * 255);
     mps = 0;
   }
 
