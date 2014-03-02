@@ -43,6 +43,7 @@ void setup()
   }
   digitalWrite(LED,LOW);
 
+  Spark.disconnect(); // We don't need any cloud after we allow re-flash, takes a ton of cycles
   //to late, hold on tight!
   Serial.println("Starting...");
   Wire.begin(true);        // join i2c bus at high speed
