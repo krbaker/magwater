@@ -46,7 +46,7 @@ void setup()
   Spark.disconnect(); // We don't need any cloud after we allow re-flash, takes a ton of cycles
   //to late, hold on tight!
   Serial.println("Starting...");
-  Wire.begin(true);        // join i2c bus at high speed
+  Wire.begin(false);        // join i2c bus at high speed
   hmc.config();        // turn the HMC5883l on
   Serial.println("Configured");
   RGB.control(true);
