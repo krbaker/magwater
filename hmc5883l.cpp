@@ -19,8 +19,8 @@ byte hmc5883l::fastread(void){
 
   Wire.beginTransmission(HMC_ADDR); // transmit to device 0x0E
   Wire.write(HMC_X_REG);              // x MSB reg
-  //Wire.endTransmission();       // actually send
-  delayMicroseconds(2); //needs at least 1.3us free time between start and stop
+  Wire.endTransmission();       // actually send
+  //delayMicroseconds(2); //needs at least 1.3us free time between start and stop
 
   if (Wire.requestFrom(HMC_ADDR, 6, true) != 6) return 1;
   x[write_position] = Wire.read() << 8; // receive the byte

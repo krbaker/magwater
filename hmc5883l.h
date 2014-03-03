@@ -11,7 +11,7 @@
 #define HMC_Z_REG         0x07 //Register for z MSB
 #define HMC_BUFFER_DEPTH  4    // size of ring buffer for storing values (max 8 due to positions)
 
-#define HMC_REFRESH       6    //number of milliseconds we have to wait to read again
+#define HMC_REFRESH       7    //number of milliseconds we have to wait to read again
 
 class hmc5883l {
  public:
