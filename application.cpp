@@ -6,6 +6,8 @@
 // This #include statement was automatically added by the Spark IDE.
 #include "hmc5883l.h"
 
+#include "sense.h"
+
 /*
     HMC5883l Watermeter Reader
     Author: Keith Baker
@@ -17,17 +19,20 @@
     Track magnetic impeller of a water meter using a digital compass.
 
 */
+#define LED        D7
+#define SENSE_KEY  "YRs5Wv4N-5JKqmk2I_hZDw"
+#define SENSE_ID   52732
 
 hmc5883l hmc = hmc5883l();
 flipflop counter = flipflop();
 unsigned long last = millis();
 unsigned long now = millis();
-byte mps = 0;
+unsigned int mps = 0;
 unsigned long last_count = 0;
 float avg = 0;
 bool blink = false;
 
-#define LED        D7
+sense sclient = sense(SENSE_KEY);
 
 void setup()
 {
@@ -68,7 +73,7 @@ void loop()
     hmc.advance();
     mps ++;
   }
-  if (now - last > 1000){
+  else if (now - last > 60000){
     last = now;
     int delta = counter.count - last_count; 
     last_count = counter.count;
@@ -84,8 +89,11 @@ void loop()
     else {
       blink = true;
     }
-    RGB.color(delta * 10, (int)(avg * 10.0), (int)blink * 255);
+    RGB.color(delta / 8, (int)(avg / 8), (int)blink * 255);
     mps = 0;
+    sclient.post(SENSE_ID, delta);
   }
-
+  else {
+    sclient.work();
+  }
 }
